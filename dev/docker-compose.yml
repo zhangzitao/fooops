@@ -1,0 +1,77 @@
+version: "3"
+services:
+  loki:
+    image: "grafana/loki:2.3.0"
+    networks:
+      - fooops
+    volumes:
+      - "./volume/loki-data:/tmp/loki"
+      - "./loki-config.yaml:/etc/loki/local-config.yaml"
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:2.3.0
+    volumes:
+      - /var/log:/var/log
+      - /Users/zt/zt_projects:/var/zt_projects
+      - "./promtail-config.yml:/etc/promtail/config.yml"
+    networks:
+      - fooops
+    command: -config.file=/etc/promtail/config.yml
+
+  prometheus:
+    image: prom/prometheus:v2.29.2
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - ./volume/prometheus:/prometheus
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - fooops
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--storage.tsdb.retention.time=10d" # 存10天
+
+  grafana:
+    logging:
+      driver: none
+    image: grafana/grafana:8.1.2
+    volumes:
+      - ./volume/grafana:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - fooops
+
+  jaeger:
+    logging:
+      driver: none
+    image: jaegertracing/all-in-one:1.25
+    volumes:
+      - ./volume/jaeger/badger:/badger
+    networks:
+      - fooops
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+    expose:
+      - "16686"
+    environment:
+      - TZ=Asia/Shanghai
+      - SPAN_STORAGE_TYPE=badger # 默认span-store-ttl储存过期时间为72小时
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
+
+networks:
+  fooops:
+    driver: "bridge"
