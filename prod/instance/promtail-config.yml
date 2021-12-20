@@ -1,0 +1,30 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: "debug"
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://fooops_ip_replace:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: system
+    static_configs:
+      # 不同的机器选择需要的targets
+      - targets:
+          - localhost
+        labels:
+          job: varlog
+          __path__: /var/log/*.log
+      - targets:
+          - localhost
+        labels:
+          job: nginx_log
+          __path__: /var/log/nginx/*.log
+      - targets:
+          - localhost
+        labels:
+          job: container
+          __path__: var/lib/docker/containers/**/*.log

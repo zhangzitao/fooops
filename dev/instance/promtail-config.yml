@@ -8,6 +8,8 @@ positions:
 
 clients:
   - url: http://loki:3100/loki/api/v1/push
+    batchsize: 102400 # <int> | default = 102400]
+    batchwait: 5s # <duration> | default = 1s
 
 scrape_configs:
   - job_name: system
@@ -15,10 +17,10 @@ scrape_configs:
       # - targets:
       #     - localhost
       #   labels:
-      #     job: varlogs
+      #     job: var-log
       #     __path__: /var/log/*.log
       - targets:
           - localhost
         labels:
-          job: projectlogs
-          __path__: /var/zt_projects/**/*.log
+          job: project-log
+          __path__: /var/project/**/*.log
