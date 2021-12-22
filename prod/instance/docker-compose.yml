@@ -3,15 +3,9 @@ services:
 
   promtail:
     image: grafana/promtail:2.3.0
-    volumes:
-      # - /var/log:/var/log
-      - xxxx:/var/log/nginx/
-      - /var/lib/docker/containers:/var/lib/docker/containers
-      - "./promtail-config.yml:/etc/promtail/config.yml"
-    networks:
-      - fooops
+    network_mode: host
     command: -config.file=/etc/promtail/config.yml
-
-networks:
-  fooops:
-    driver: "bridge"
+    volumes:
+      - "./promtail-config.yml:/etc/promtail/config.yml"
+      - "/var/lib/docker/containers/80480c418b9a8bc7b7ec01ea9fa2ce8c68796ac6b750d0bd3290e300649c32ef:/var/lib/docker/containers/80480c418b9a8bc7b7ec01ea9fa2ce8c68796ac6b750d0bd3290e300649c32ef"
+      - "/var/lib/docker/containers/5a03ab3e4ad3eef9fdee41d713856b46899eaae56ee59b16d56c485da0717663:/var/lib/docker/containers/5a03ab3e4ad3eef9fdee41d713856b46899eaae56ee59b16d56c485da0717663"
