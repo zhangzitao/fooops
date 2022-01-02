@@ -40,7 +40,7 @@ while getopts "n:a:" flag; do
     esac
 done
 for name in $name_list; do
-    for shortid in $(docker ps -qaf "name=$name" ); do
+    for shortid in $(docker ps -qf "name=$name" ); do
         echo "container id: $shortid name: $name"
         for dir in $(docker inspect --format="{{.Id}}" $shortid); do
             echo "      - \"/var/lib/docker/containers/$dir:/var/lib/docker/containers/$dir\"" >> ./docker-compose.yml
@@ -84,7 +84,7 @@ scrape_configs:
 EOF
 
 for name in $name_list; do
-    for shortid in $(docker ps -qaf "name=$name" ); do
+    for shortid in $(docker ps -qf "name=$name" ); do
         echo "      - targets:
         - localhost"  >> ./promtail-config.yml
         echo "        labels:" >> ./promtail-config.yml

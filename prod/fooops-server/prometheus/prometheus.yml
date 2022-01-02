@@ -28,6 +28,12 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  - job_name: "xxxx"
+  - job_name: "materialhub_server"
     static_configs:
-      - targets: ["xxxx_ip:18888"]
+      - targets: ["172.26.189.32:35208"]
+  - job_name: "materialhub_worker"
+    static_configs:
+      - targets: ["172.26.189.32:35218"]
+  - job_name: "materialhub_cron"
+    static_configs:
+      - targets: ["172.26.189.32:35228"]
