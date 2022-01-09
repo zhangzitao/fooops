@@ -28,12 +28,14 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  - job_name: "materialhub_server"
-    static_configs:
-      - targets: ["172.26.189.32:35208"]
-  - job_name: "materialhub_worker"
-    static_configs:
-      - targets: ["172.26.189.32:35218"]
-  - job_name: "materialhub_cron"
-    static_configs:
-      - targets: ["172.26.189.32:35228"]
+  - job_name: "materialhub"
+    metrics_path: /metrics
+    scheme: http
+    consul_sd_configs:
+      - server: 172.26.189.32:8500
+        services: []
+    relabel_configs:
+      - source_labels: ["__meta_consul_service"]
+        target_label: "service_name"
+      - source_labels: ["__meta_consul_service_id"]
+        target_label: "container_id"
