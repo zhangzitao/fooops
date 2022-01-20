@@ -21,8 +21,13 @@ services:
 
   promtail:
     image: grafana/promtail:2.3.0
-    network_mode: host
     command: -config.file=/etc/promtail/config.yml
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
     volumes:
       - "./promtail-config.yml:/etc/promtail/config.yml"
 EOF
@@ -40,12 +45,15 @@ while getopts "n:a:" flag; do
     esac
 done
 for name in $name_list; do
+    OLDIFS="$IFS"
+    IFS=$'\n'
     for shortid in $(docker ps -qf "name=$name" ); do
         echo "container id: $shortid name: $name"
         for dir in $(docker inspect --format="{{.Id}}" $shortid); do
             echo "      - \"/var/lib/docker/containers/$dir:/var/lib/docker/containers/$dir\"" >> ./docker-compose.yml
         done
     done
+    IFS="$OLDIFS"
 done
 
 echo "loki address: $loki_addr"
@@ -84,6 +92,8 @@ scrape_configs:
 EOF
 
 for name in $name_list; do
+    OLDIFS="$IFS"
+    IFS=$'\n'
     for shortid in $(docker ps -qf "name=$name" ); do
         echo "      - targets:
         - localhost"  >> ./promtail-config.yml
@@ -95,7 +105,9 @@ for name in $name_list; do
         done
         idsjoin=$(IFS=, ; echo "${ids[*]}")
         echo "          __path__: /var/lib/docker/containers/{$idsjoin}/*.log" >> ./promtail-config.yml
+        IFS=$'\n'
     done
+    IFS="$OLDIFS"
 done
 
 docker-compose down --remove-orphans
