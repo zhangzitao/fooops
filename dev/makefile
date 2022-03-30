@@ -1,9 +1,9 @@
 up:
-	@cd fooops-server ;\
+	@cd fooops_server ;\
 	docker-compose -p fooops-dev up --force-recreate
 
 down:
-	@cd fooops-server ;\
+	@cd fooops_server ;\
 	docker-compose -p fooops-dev down --remove-orphans
 
 up-promtail:

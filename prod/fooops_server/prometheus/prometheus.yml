@@ -39,3 +39,14 @@ scrape_configs:
         target_label: "service_name"
       - source_labels: ["__meta_consul_service_id"]
         target_label: "container_id"
+  - job_name: "materialhub_worker"
+    metrics_path: /metrics
+    scheme: http
+    consul_sd_configs:
+      - server: 172.26.189.35:8500
+        services: []
+    relabel_configs:
+      - source_labels: ["__meta_consul_service"]
+        target_label: "service_name"
+      - source_labels: ["__meta_consul_service_id"]
+        target_label: "container_id"
